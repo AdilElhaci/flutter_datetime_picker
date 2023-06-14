@@ -23,6 +23,7 @@ class DatePicker {
   static Future<DateTime?> showDatePicker(
     BuildContext context, {
     bool showTitleActions: true,
+    bool showDaysColumn: true,
     DateTime? minTime,
     DateTime? maxTime,
     DateChangedCallback? onChanged,
@@ -36,6 +37,7 @@ class DatePicker {
       context,
       _DatePickerRoute(
         showTitleActions: showTitleActions,
+        showDaysColumn: showDaysColumn,
         onChanged: onChanged,
         onConfirm: onConfirm,
         onCancel: onCancel,
@@ -60,6 +62,7 @@ class DatePicker {
     BuildContext context, {
     bool showTitleActions: true,
     bool showSecondsColumn: true,
+    bool showDaysColumn: true,
     DateChangedCallback? onChanged,
     DateChangedCallback? onConfirm,
     DateCancelledCallback? onCancel,
@@ -71,6 +74,7 @@ class DatePicker {
       context,
       _DatePickerRoute(
         showTitleActions: showTitleActions,
+        showDaysColumn: showDaysColumn,
         onChanged: onChanged,
         onConfirm: onConfirm,
         onCancel: onCancel,
@@ -93,6 +97,7 @@ class DatePicker {
   static Future<DateTime?> showTime12hPicker(
     BuildContext context, {
     bool showTitleActions: true,
+    bool showDaysColumn: true,
     DateChangedCallback? onChanged,
     DateChangedCallback? onConfirm,
     DateCancelledCallback? onCancel,
@@ -104,6 +109,7 @@ class DatePicker {
       context,
       _DatePickerRoute(
         showTitleActions: showTitleActions,
+        showDaysColumn: showDaysColumn,
         onChanged: onChanged,
         onConfirm: onConfirm,
         onCancel: onCancel,
@@ -125,6 +131,7 @@ class DatePicker {
   static Future<DateTime?> showDateTimePicker(
     BuildContext context, {
     bool showTitleActions: true,
+    bool showDaysColumn: true,
     DateTime? minTime,
     DateTime? maxTime,
     DateChangedCallback? onChanged,
@@ -138,6 +145,7 @@ class DatePicker {
       context,
       _DatePickerRoute(
         showTitleActions: showTitleActions,
+        showDaysColumn: showDaysColumn,
         onChanged: onChanged,
         onConfirm: onConfirm,
         onCancel: onCancel,
@@ -161,6 +169,7 @@ class DatePicker {
   static Future<DateTime?> showPicker(
     BuildContext context, {
     bool showTitleActions: true,
+    bool showDaysColumn: true,
     DateChangedCallback? onChanged,
     DateChangedCallback? onConfirm,
     DateCancelledCallback? onCancel,
@@ -172,6 +181,7 @@ class DatePicker {
       context,
       _DatePickerRoute(
         showTitleActions: showTitleActions,
+        showDaysColumn: showDaysColumn,
         onChanged: onChanged,
         onConfirm: onConfirm,
         onCancel: onCancel,
@@ -188,6 +198,7 @@ class DatePicker {
 class _DatePickerRoute<T> extends PopupRoute<T> {
   _DatePickerRoute({
     this.showTitleActions,
+    this.showDaysColumn: true,
     this.onChanged,
     this.onConfirm,
     this.onCancel,
@@ -201,6 +212,7 @@ class _DatePickerRoute<T> extends PopupRoute<T> {
         super(settings: settings);
 
   final bool? showTitleActions;
+  final bool showDaysColumn;
   final DateChangedCallback? onChanged;
   final DateChangedCallback? onConfirm;
   final DateCancelledCallback? onCancel;
@@ -241,6 +253,7 @@ class _DatePickerRoute<T> extends PopupRoute<T> {
         locale: this.locale,
         route: this,
         pickerModel: pickerModel,
+        showDaysColumn: showDaysColumn??true,
       ),
     );
     return InheritedTheme.captureAll(context, bottomSheet);
@@ -252,6 +265,7 @@ class _DatePickerComponent extends StatefulWidget {
     Key? key,
     required this.route,
     required this.pickerModel,
+    required this.showDaysColumn,
     this.onChanged,
     this.locale,
   }) : super(key: key);
@@ -261,6 +275,7 @@ class _DatePickerComponent extends StatefulWidget {
   final _DatePickerRoute route;
 
   final LocaleType? locale;
+  final bool showDaysColumn;
 
   final BasePickerModel pickerModel;
 
@@ -310,7 +325,7 @@ class _DatePickerState extends State<_DatePickerComponent> {
               child: GestureDetector(
                 child: Material(
                   color: theme.backgroundColor,
-                  child: _renderPickerView(theme),
+                  child: _renderPickerView(theme, widget.route.showDaysColumn),
                 ),
               ),
             ),
@@ -326,8 +341,8 @@ class _DatePickerState extends State<_DatePickerComponent> {
     }
   }
 
-  Widget _renderPickerView(DatePickerTheme theme) {
-    Widget itemView = _renderItemView(theme);
+  Widget _renderPickerView(DatePickerTheme theme,bool showDaysColumn) {
+    Widget itemView = _renderItemView(theme,showDaysColumn);
     if (widget.route.showTitleActions == true) {
       return Column(
         children: <Widget>[
@@ -396,7 +411,7 @@ class _DatePickerState extends State<_DatePickerComponent> {
     );
   }
 
-  Widget _renderItemView(DatePickerTheme theme) {
+  Widget _renderItemView(DatePickerTheme theme,bool showDaysColumn) {
     return Container(
       color: theme.backgroundColor,
       child: Directionality(
@@ -446,7 +461,7 @@ class _DatePickerState extends State<_DatePickerComponent> {
               widget.pickerModel.rightDivider(),
               style: theme.itemStyle,
             ),
-            Container(
+            showDaysColumn?  Container(
               child: widget.pickerModel.layoutProportions()[2] > 0
                   ? _renderColumnView(
                       ValueKey(widget.pickerModel.currentMiddleIndex() * 100 +
@@ -463,7 +478,7 @@ class _DatePickerState extends State<_DatePickerComponent> {
                       });
                     })
                   : null,
-            ),
+            ):Container(),
           ],
         ),
       ),
